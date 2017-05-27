@@ -19,7 +19,7 @@ func main() {
 
     c, err := maps.NewClient(maps.WithAPIKey(os.Getenv("MAPS_KEY")))
 
-    if err!=nil {
+    if err != nil {
         log.Fatalf("Fatal error %s", err)
     }
 
@@ -32,13 +32,22 @@ func main() {
         Destinations:  destination,
         Mode:          "driving",
         DepartureTime: now,
+        TrafficModel:  "best_guess",
+        Units:         "imperial",
     }
+    // get the actual ETA off the distance matrix lib
+    etaResponse, etaErr := getETA(eta, c)
 
-    resp, err := c.DistanceMatrix(context.Background(), eta)
-    if err != nil {
-        log.Fatalf("fatal error: %s", err)
+    if etaErr != nil {
+        log.Fatalf("fatal error: %s", etaErr)
     }
+    myResponse := etaResponse.Rows[0].Elements[0]
 
-    pretty.Println(resp)
+    pretty.Println(myResponse.DurationInTraffic.String())
+    pretty.Println(myResponse.Duration.String())
+}
 
+func getETA(body *maps.DistanceMatrixRequest, client *maps.Client) (*maps.DistanceMatrixResponse, error) {
+    resp, err := client.DistanceMatrix(context.Background(), body)
+    return resp, err
 }
