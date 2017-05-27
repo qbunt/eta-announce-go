@@ -9,24 +9,37 @@ import (
     "strconv"
     "github.com/joho/godotenv"
     "os"
+    "gopkg.in/gin-gonic/gin.v1"
+    "net/http"
 )
 
-func main() {
-    err := godotenv.Load()
+func check(err error) {
     if err != nil {
-        log.Fatal("Error loading .env file")
+        log.Fatalf("fatal error: %s", err)
     }
+}
 
+func setupServer() {
+    router := gin.Default()
+    router.GET("/", func(c *gin.Context) {
+        from := c.Query("from")
+        to := c.Query("to")
+
+        myResp := calcEta(from, to)
+        pretty.Println(myResp)
+        c.String(http.StatusOK, "%s", myResp)
+    })
+    router.Run(":"+os.Getenv("SERVER_PORT"))
+}
+
+func calcEta(from string, to string) string {
     c, err := maps.NewClient(maps.WithAPIKey(os.Getenv("MAPS_KEY")))
+    check(err)
 
-    if err != nil {
-        log.Fatalf("Fatal error %s", err)
-    }
+    origin := []string{from}
+    destination := []string{to}
 
-    origin := []string{os.Getenv("WORK_ADDRESS")}
-    destination := []string{os.Getenv("HOME_ADDRESS")}
     now := strconv.FormatInt(time.Now().Unix(), 10)
-
     eta := &maps.DistanceMatrixRequest{
         Origins:       origin,
         Destinations:  destination,
@@ -36,18 +49,33 @@ func main() {
         Units:         "imperial",
     }
     // get the actual ETA off the distance matrix lib
-    etaResponse, etaErr := getETA(eta, c)
+    etaResponse := getETA(eta, c)
+    apiEta := etaResponse.Rows[0].Elements[0].DurationInTraffic.String()
 
-    if etaErr != nil {
-        log.Fatalf("fatal error: %s", etaErr)
-    }
-    myResponse := etaResponse.Rows[0].Elements[0]
+    // delay the time by a touch to get out to the car
+    delayedTime := time.Now().Add(addDelay(os.Getenv("DEPARTURE_OFFSET")))
+    predictedETA, err := time.ParseDuration(apiEta)
+    check(err)
 
-    pretty.Println(myResponse.DurationInTraffic.String())
-    pretty.Println(myResponse.Duration.String())
+    completedEta := delayedTime.Add(predictedETA).Format(time.Kitchen)
+    return completedEta
 }
 
-func getETA(body *maps.DistanceMatrixRequest, client *maps.Client) (*maps.DistanceMatrixResponse, error) {
+func main() {
+    err := godotenv.Load()
+    check(err)
+
+    setupServer()
+}
+
+func addDelay(s string) time.Duration {
+    delay, err := time.ParseDuration(s)
+    check(err)
+    return delay
+}
+
+func getETA(body *maps.DistanceMatrixRequest, client *maps.Client) (*maps.DistanceMatrixResponse) {
     resp, err := client.DistanceMatrix(context.Background(), body)
-    return resp, err
+    check(err)
+    return resp
 }
