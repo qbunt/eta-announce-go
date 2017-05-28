@@ -1,9 +1,9 @@
 package main
 
 import (
-	"./twilio"
 	"github.com/joho/godotenv"
 	"github.com/kr/pretty"
+	"github.com/qbunt/eta-announce-go/twilio"
 	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
 	"gopkg.in/gin-gonic/gin.v1"
@@ -21,7 +21,7 @@ func check(err error) {
 }
 
 func setupServer() {
-    gin.SetMode(gin.ReleaseMode)
+	//gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	router.GET("/", func(c *gin.Context) {
 		from := c.Query("from")
