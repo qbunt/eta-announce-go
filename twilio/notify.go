@@ -18,9 +18,8 @@ func Notify(phoneNumber string, eta string) error {
 	v := url.Values{}
 	v.Set("To", phoneNumber)
 	v.Set("From", os.Getenv("TWILIO_PHONE"))
-	message := strings.Replace(os.Getenv("MESSAGE"), "{{NAME}}", os.Getenv("NAME"), 1)
-	etaMessage := strings.Replace(message, "{{ETA}}", eta, 1)
-	v.Set("Body", etaMessage)
+	message := fmt.Sprintf(os.Getenv("MESSAGE"), os.Getenv("NAME"), eta)
+	v.Set("Body", message)
 
 	rb := *strings.NewReader(v.Encode())
 
@@ -49,5 +48,5 @@ func Notify(phoneNumber string, eta string) error {
 	} else {
 		fmt.Println(resp.Status)
 	}
-    return nil
+	return nil
 }

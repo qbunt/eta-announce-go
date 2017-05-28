@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/kr/pretty"
+	"github.com/qbunt/eta-announce-go/ifttt"
 	"github.com/qbunt/eta-announce-go/twilio"
 	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
@@ -28,19 +30,20 @@ func setupServer() {
 		to := c.Query("to")
 		phone := c.Query("phone")
 
-		myETA, err := calcEta(from, to)
+		timeInTraffic, myETA, err := calcEta(from, to)
+		check(err)
 		if phone != "" {
 			twilio.Notify(phone, myETA)
+			ifttt.Notify(timeInTraffic)
 		}
-		check(err)
 
 		pretty.Println(myETA)
-		c.String(http.StatusOK, "%s", myETA)
+		c.String(http.StatusOK, "'%s ETA' generated at %s", myETA, time.Now())
 	})
 	router.Run(":" + os.Getenv("SERVER_PORT"))
 }
 
-func calcEta(f string, t string) (string, error) {
+func calcEta(f string, t string) (string, string, error) {
 	c, err := maps.NewClient(maps.WithAPIKey(os.Getenv("MAPS_KEY")))
 	check(err)
 
@@ -63,8 +66,10 @@ func calcEta(f string, t string) (string, error) {
 	delayedTime := time.Now().Add(predictedETA)
 	check(err)
 
+	timeInTraffic := fmt.Sprint(predictedETA.Minutes())
+
 	completedEta := delayedTime.Format(time.Kitchen)
-	return completedEta, err
+	return timeInTraffic, completedEta, err
 }
 
 func main() {
