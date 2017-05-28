@@ -41,10 +41,13 @@ func Notify(phoneNumber string, eta string) error {
 		err := json.Unmarshal(bodyBytes, &data)
 		if err == nil {
 			fmt.Println(data["sid"])
+			err = nil
+			return err
 		} else {
-            return err
-        }
+			return err
+		}
 	} else {
 		fmt.Println(resp.Status)
 	}
+    return nil
 }

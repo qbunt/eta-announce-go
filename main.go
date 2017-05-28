@@ -21,6 +21,7 @@ func check(err error) {
 }
 
 func setupServer() {
+    gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	router.GET("/", func(c *gin.Context) {
 		from := c.Query("from")
