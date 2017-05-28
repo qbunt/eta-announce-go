@@ -26,7 +26,7 @@ func setupServer() {
 		to := c.Query("to")
 
 		myResp, err := calcEta(from, to)
-        check(err)
+		check(err)
 
 		pretty.Println(myResp)
 		c.String(http.StatusOK, "%s", myResp)
