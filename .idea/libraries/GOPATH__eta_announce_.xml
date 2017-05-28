@@ -1,14 +1,20 @@
 <component name="libraryTable">
   <library name="GOPATH &lt;eta-announce&gt;">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../../googlemaps.github.io" />
-      <root url="file://$PROJECT_DIR$/../../../golang.org" />
-      <root url="file://$PROJECT_DIR$/../.." />
+      <root url="file://$PROJECT_DIR$/../../9fans.net" />
+      <root url="file://$PROJECT_DIR$/../../googlemaps.github.io" />
+      <root url="file://$PROJECT_DIR$/.." />
+      <root url="file://$PROJECT_DIR$/../../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../../honnef.co" />
+      <root url="file://$PROJECT_DIR$/../../golang.org" />
     </CLASSES>
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/../../../googlemaps.github.io" />
-      <root url="file://$PROJECT_DIR$/../../../golang.org" />
-      <root url="file://$PROJECT_DIR$/../.." />
+      <root url="file://$PROJECT_DIR$/../../9fans.net" />
+      <root url="file://$PROJECT_DIR$/../../googlemaps.github.io" />
+      <root url="file://$PROJECT_DIR$/.." />
+      <root url="file://$PROJECT_DIR$/../../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../../honnef.co" />
+      <root url="file://$PROJECT_DIR$/../../golang.org" />
     </SOURCES>
     <excluded>
       <root url="file://$PROJECT_DIR$" />

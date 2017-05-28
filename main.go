@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./twilio"
 	"github.com/joho/godotenv"
 	"github.com/kr/pretty"
 	"golang.org/x/net/context"
@@ -24,12 +25,16 @@ func setupServer() {
 	router.GET("/", func(c *gin.Context) {
 		from := c.Query("from")
 		to := c.Query("to")
+		phone := c.Query("phone")
 
-		myResp, err := calcEta(from, to)
+		myETA, err := calcEta(from, to)
+		if phone != "" {
+			twilio.Notify(phone, myETA)
+		}
 		check(err)
 
-		pretty.Println(myResp)
-		c.String(http.StatusOK, "%s", myResp)
+		pretty.Println(myETA)
+		c.String(http.StatusOK, "%s", myETA)
 	})
 	router.Run(":" + os.Getenv("SERVER_PORT"))
 }
