@@ -30,7 +30,6 @@ func Notify(phoneNumber string, eta string) error {
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	// Make request
 	resp, _ := client.Do(req)
 	fmt.Println(resp.Status)
 

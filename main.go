@@ -6,6 +6,7 @@ import (
 	"github.com/kr/pretty"
 	"github.com/qbunt/eta-announce-go/ifttt"
 	"github.com/qbunt/eta-announce-go/twilio"
+	"github.com/qbunt/eta-announce-go/utils"
 	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
 	"gopkg.in/gin-gonic/gin.v1"
@@ -34,7 +35,7 @@ func setupServer() {
 		check(err)
 		if phone != "" {
 			twilio.Notify(phone, myETA)
-			ifttt.Notify(timeInTraffic)
+			ifttt.Notify(timeInTraffic, myETA)
 		}
 
 		pretty.Println(myETA)
@@ -50,6 +51,7 @@ func calcEta(f string, t string) (string, string, error) {
 	origin := []string{f}
 	destination := []string{t}
 
+    // add a walking time buffer to start time
 	nowish := strconv.FormatInt(time.Now().Add(parseTime(os.Getenv("DEPARTURE_OFFSET"))).Unix(), 10)
 
 	eta := &maps.DistanceMatrixRequest{
@@ -66,7 +68,7 @@ func calcEta(f string, t string) (string, string, error) {
 	delayedTime := time.Now().Add(predictedETA)
 	check(err)
 
-	timeInTraffic := fmt.Sprint(predictedETA.Minutes())
+	timeInTraffic := fmt.Sprint(utils.Round(predictedETA.Minutes(), .5, 0))
 
 	completedEta := delayedTime.Format(time.Kitchen)
 	return timeInTraffic, completedEta, err
