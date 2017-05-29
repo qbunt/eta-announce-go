@@ -39,7 +39,8 @@ func setupServer() {
 		}
 
 		pretty.Println(myETA)
-		c.String(http.StatusOK, "'%s ETA' generated at %s", myETA, time.Now())
+
+		c.String(http.StatusOK, "%s mins in traffic, '%s ETA' generated at %s", timeInTraffic, myETA, time.Now())
 	})
 	router.Run(":" + os.Getenv("SERVER_PORT"))
 }
@@ -51,7 +52,7 @@ func calcEta(f string, t string) (string, string, error) {
 	origin := []string{f}
 	destination := []string{t}
 
-    // add a walking time buffer to start time
+	// add a walking time buffer to start time
 	nowish := strconv.FormatInt(time.Now().Add(parseTime(os.Getenv("DEPARTURE_OFFSET"))).Unix(), 10)
 
 	eta := &maps.DistanceMatrixRequest{
@@ -65,6 +66,7 @@ func calcEta(f string, t string) (string, string, error) {
 	// get the actual ETA off the distance matrix lib
 	etaResponse := getETA(eta, c)
 	predictedETA, err := time.ParseDuration(etaResponse.Rows[0].Elements[0].DurationInTraffic.String())
+	pretty.Println(predictedETA.String())
 	delayedTime := time.Now().Add(predictedETA)
 	check(err)
 
