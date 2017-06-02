@@ -1,0 +1,11 @@
+[Unit]
+Description=Start a webservice for ETA announcement
+
+[Service]
+PIDFile=/var/run/eta.pid
+EnvironmentFile=/home/qbunt/eta-announce-go/.env
+ExecStart=/home/qbunt/eta-announce-go/eta-amd
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
