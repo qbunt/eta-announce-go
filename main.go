@@ -15,11 +15,13 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"github.com/getsentry/raven-go"
 )
 
 func check(err error) {
 	if err != nil {
-		log.Fatalf("fatal error: %s", err)
+        raven.CaptureErrorAndWait(err, nil)
+        log.Fatalf("fatal error: %s", err)
 	}
 }
 
@@ -76,8 +78,10 @@ func calcEta(f string, t string) (string, string, error) {
 	return timeInTraffic, completedEta, err
 }
 
+
 func main() {
 	err := godotenv.Load()
+    raven.SetDSN(os.Getenv("SENTRY_DSN"))
 	check(err)
 	setupServer()
 }
